@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ocelot": {
+      "commandName": "Project",
+      "commandLineArgs": "-addr 144.168.61.122 -log info -u libra"
+    }
+  }
+}
