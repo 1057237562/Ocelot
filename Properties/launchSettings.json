@@ -2,7 +2,7 @@
   "profiles": {
     "Ocelot": {
       "commandName": "Project",
-      "commandLineArgs": "-addr 144.168.61.122 -log info -u libra"
+      "commandLineArgs": "-addr 144.168.61.122 -p 3000 -sp 3000 -u libra"
     }
   }
 }

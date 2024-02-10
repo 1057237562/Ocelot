@@ -16,7 +16,7 @@ namespace Ocelot
         public Client(string sip, int sport, int port)
         {
             Console.WriteLine("Proxy listening at : " + port);
-            var listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            var listener = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
             var aes = Aes.Create();
             using (var link = new TcpClient(sip, sport))
             {
