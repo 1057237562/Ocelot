@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 
@@ -13,6 +14,12 @@ namespace Ocelot
         public Server(int port)
         {
             var listener = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
+            var aes = Aes.Create();
+            if(aes == null)
+            {
+                Console.WriteLine("Failed in creating Crypto Instance.");
+                return;
+            }
             listener.Start();
             if (Program.log)
                 Console.WriteLine("Server started at : " + port);
@@ -23,7 +30,6 @@ namespace Ocelot
 
                 if (Program.log)
                     Console.WriteLine("Incomming Transmittion : " + client.Client.RemoteEndPoint!.ToString());
-                var aes = Aes.Create();
                 try
                 {
                     if (link.ReadByte() == 0)
@@ -56,10 +62,10 @@ namespace Ocelot
                             th.IsBackground = true;
                             th.Start();
                         }
-                        catch (Exception) { transmit.Stop(); }
+                        catch (Exception e) { transmit.Stop(); Console.Error.WriteLine(e); }
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { Console.Error.WriteLine(e); }
             }
         }
 
