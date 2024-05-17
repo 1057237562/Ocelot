@@ -87,7 +87,7 @@ namespace Ocelot
                             Console.WriteLine("Closing " + soft.Client.RemoteEndPoint!.ToString() + " to " + alloc!.Client.RemoteEndPoint!.ToString());
 
                     }
-                    catch (Exception) { }
+                    catch (Exception e) { Console.Error.WriteLine(e); }
                     mutex.WaitOne();
 
                     threadCnt--;

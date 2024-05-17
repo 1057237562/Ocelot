@@ -46,6 +46,8 @@ namespace Ocelot
                         try
                         {
                             var token = Respond(link, aes);
+                            ICryptoTransform encryptor = aes.CreateEncryptor();
+                            ICryptoTransform decryptor = aes.CreateDecryptor();
                             byte[] pb = token.encrypt.Encrypt(BitConverter.GetBytes(((IPEndPoint)transmit.LocalEndpoint!).Port), true);
                             link.Write(BitConverter.GetBytes(pb.Length));
                             link.Write(pb);
@@ -54,8 +56,8 @@ namespace Ocelot
                                 using (var incoming = transmit.AcceptTcpClient())
                                 {
                                     using var istream = incoming.GetStream();
-                                    using var dst = new EncryptNetworkStream(istream, aes.CreateEncryptor(), aes.CreateDecryptor()); ;
-                                    try { Socks.handle(dst); } catch (Exception) { }
+                                    using var dst = new EncryptNetworkStream(istream, encryptor, decryptor); ;
+                                    try { Socks.handle(dst); } catch (Exception e) { Console.Error.WriteLine(e); }
                                 }
                                 transmit.Stop();
                             });
