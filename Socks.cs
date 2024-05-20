@@ -57,11 +57,9 @@ namespace Ocelot
             using var connect = new TcpClient(ipaddr.hostname, ipaddr.port);
             using var result = connect.GetStream();
 
-            var th = new Thread(() => { try { stream.CopyTo(result); } catch (Exception) { } result.TryClose(); });
-            th.IsBackground = true;
-            th.Start();
+            ThreadPool.QueueUserWorkItem(_ => { try { stream.CopyTo(result); } catch (Exception) { } result.TryClose(); });
             try { result.CopyTo(stream); } catch (Exception) { }
-            th.Interrupt();
+            result.TryClose();
         }
     }
 }

@@ -4,7 +4,6 @@ namespace Ocelot
 {
     class Program
     {
-
         static string ipaddr = "127.0.0.1";
         static int port;
         static int sport;

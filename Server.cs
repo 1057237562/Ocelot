@@ -51,7 +51,7 @@ namespace Ocelot
                             byte[] pb = token.encrypt.Encrypt(BitConverter.GetBytes(((IPEndPoint)transmit.LocalEndpoint!).Port), true);
                             link.Write(BitConverter.GetBytes(pb.Length));
                             link.Write(pb);
-                            var th = new Thread(() =>
+                            ThreadPool.QueueUserWorkItem(_ =>
                             {
                                 using (var incoming = transmit.AcceptTcpClient())
                                 {
@@ -61,8 +61,6 @@ namespace Ocelot
                                 }
                                 transmit.Stop();
                             });
-                            th.IsBackground = true;
-                            th.Start();
                         }
                         catch (Exception e) { transmit.Stop(); Console.Error.WriteLine(e); }
                     }

@@ -32,7 +32,7 @@ namespace Ocelot
                 threadCnt++;
                 try { Console.Clear(); } catch (Exception) { }
                 Console.Error.WriteLine("Current alive connection count:" + threadCnt);
-                var th = new Thread(() =>
+                ThreadPool.QueueUserWorkItem(_ =>
                 {
                     try
                     {
@@ -98,9 +98,6 @@ namespace Ocelot
                     src.Dispose();
                     soft.Dispose();
                 });
-
-                th.IsBackground = true;
-                th.Start();
             }
         }
 
@@ -152,11 +149,9 @@ namespace Ocelot
 
         public void HandleStream(Stream src, Stream dst)
         {
-            var th = new Thread(() => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); });
-            th.IsBackground = true;
-            th.Start();
+            ThreadPool.QueueUserWorkItem(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); });
             try { src.CopyTo(dst); } catch (Exception) { }
-            th.Interrupt();
+            dst.TryClose();
         }
 
     }
