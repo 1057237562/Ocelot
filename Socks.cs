@@ -55,6 +55,7 @@ namespace Ocelot
         {
             Address ipaddr = parseDst(stream);
             using var connect = new TcpClient(ipaddr.hostname, ipaddr.port);
+            connect.ReceiveTimeout = 1000;
             using var result = connect.GetStream();
 
             ThreadPool.QueueUserWorkItem(_ => { try { stream.CopyTo(result); } catch (Exception) { } result.TryClose(); });
