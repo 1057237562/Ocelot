@@ -150,8 +150,7 @@ namespace Ocelot
 
         public void HandleStream(Stream src, Stream dst)
         {
-            Thread th = new Thread(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); dst.TryClose(); });
-            th.Start();
+            ThreadPool.QueueUserWorkItem(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); dst.TryClose(); });
             try { src.CopyTo(dst); } catch (Exception) { }
             dst.TryClose();
             src.TryClose();

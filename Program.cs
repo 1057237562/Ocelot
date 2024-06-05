@@ -57,11 +57,12 @@ namespace Ocelot
 
             if (mode == 0)
             {
+                ThreadPool.SetMaxThreads(Environment.ProcessorCount * 32, Environment.ProcessorCount * 32);
                 Client client = new Client(ipaddr, sport, port);
             }
             else
             {
-                ThreadPool.SetMaxThreads(64, 64);
+                ThreadPool.SetMaxThreads(Environment.ProcessorCount * 64, Environment.ProcessorCount * 64);
                 Server server = new Server(port);
             }
         }
