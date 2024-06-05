@@ -61,6 +61,7 @@ namespace Ocelot
             }
             else
             {
+                ThreadPool.SetMaxThreads(64, 64);
                 Server server = new Server(port);
             }
         }

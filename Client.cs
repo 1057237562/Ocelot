@@ -27,7 +27,8 @@ namespace Ocelot
             while (true)
             {
                 var soft = listener.AcceptTcpClient();
-
+                //soft.ReceiveTimeout = 5000;
+                //soft.SendTimeout = 5000;
                 var src = soft.GetStream();
                 threadCnt++;
                 try { Console.Clear(); } catch (Exception) { }
@@ -149,9 +150,11 @@ namespace Ocelot
 
         public void HandleStream(Stream src, Stream dst)
         {
-            ThreadPool.QueueUserWorkItem(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); });
+            Thread th = new Thread(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); dst.TryClose(); });
+            th.Start();
             try { src.CopyTo(dst); } catch (Exception) { }
             dst.TryClose();
+            src.TryClose();
         }
 
     }

@@ -26,6 +26,8 @@ namespace Ocelot
             while (true)
             {
                 using var client = listener.AcceptTcpClient();
+                client.ReceiveTimeout = 5000;
+                client.SendTimeout = 5000;
                 using var link = client.GetStream();
 
                 if (Program.log)
