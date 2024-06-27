@@ -21,7 +21,7 @@ namespace Ocelot
                 return;
             }
             listener.Start();
-            if (Program.log)
+            if ((Program.log & 2) != 0)
                 Console.WriteLine("Server started at : " + port);
             while (true)
             {
@@ -30,7 +30,7 @@ namespace Ocelot
                 client.SendTimeout = 5000;
                 using var link = client.GetStream();
 
-                if (Program.log)
+                if ((Program.log & 2) != 0)
                     Console.WriteLine("Incomming Transmittion : " + client.Client.RemoteEndPoint!.ToString());
                 try
                 {
@@ -43,7 +43,7 @@ namespace Ocelot
                         var transmit = new TcpListener(IPAddress.Any, 0);
                         transmit.Start();
 
-                        if (Program.log)
+                        if ((Program.log & 2) != 0)
                             Console.WriteLine("Open repeater on port : " + ((IPEndPoint)transmit.LocalEndpoint!).Port);
                         try
                         {

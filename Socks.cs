@@ -61,8 +61,8 @@ namespace Ocelot
 
             ThreadPool.QueueUserWorkItem(_ => { try { stream.CopyTo(result); } catch (Exception) { } result.TryClose(); stream.TryClose(); });
             try { result.CopyTo(stream); } catch (Exception) { }
-            result.TryClose();
-            stream.TryClose();
+            result.TryClose(); 
+            stream.TryClose(); 
         }
     }
 }

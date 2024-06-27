@@ -10,7 +10,7 @@ namespace Ocelot
         static int mode = 0;
         public static string user = "guest";
         public static string pass = "password";
-        public static bool log = false;
+        public static int log = 1;
         static void Main(string[] args)
         {
             var rootCommand = new RootCommand("A encrypted network proxy.");
@@ -33,7 +33,7 @@ namespace Ocelot
             var Opass = new Option<string?>("-pass", () => "", "Set password for sessions");
             rootCommand.AddOption(Opass);
 
-            var Olog = new Option<string?>("-log", () => "none", "Set log level");
+            var Olog = new Option<string?>("-log", () => "info", "Set log level");
             rootCommand.AddOption(Olog);
 
             rootCommand.SetHandler((a, b, c, d, e, f, g) =>
@@ -49,7 +49,19 @@ namespace Ocelot
                 pass = f!;
                 if (g == "info")
                 {
-                    log = true;
+                    log = 1;
+                }
+                if(g == "none")
+                {
+                    log = 0;
+                }
+                if(g == "all")
+                {
+                    log = 3;
+                }
+                if(g == "connection")
+                {
+                    log = 2;
                 }
             }, ip, Oport, Osport, Omode, Ouser, Opass, Olog);
 
@@ -57,7 +69,6 @@ namespace Ocelot
 
             if (mode == 0)
             {
-                ThreadPool.SetMaxThreads(Environment.ProcessorCount * 32, Environment.ProcessorCount * 32);
                 Client client = new Client(ipaddr, sport, port);
             }
             else

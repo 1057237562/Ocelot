@@ -30,10 +30,16 @@ namespace Ocelot
                 //soft.ReceiveTimeout = 5000;
                 //soft.SendTimeout = 5000;
                 var src = soft.GetStream();
+                
                 threadCnt++;
-                try { Console.Clear(); } catch (Exception) { }
-                Console.Error.WriteLine("Current alive connection count:" + threadCnt);
-                ThreadPool.QueueUserWorkItem(_ =>
+                if ((Program.log & 2) == 0)
+                {
+                    try { Console.Clear(); } catch (Exception) { }
+                }
+
+                if ((Program.log & 1) != 0)
+                    Console.Error.WriteLine("Current alive connection count:" + threadCnt);
+                Thread th = new Thread(_ =>
                 {
                     try
                     {
@@ -43,8 +49,13 @@ namespace Ocelot
                             mutex.WaitOne();
 
                             threadCnt--;
-                            try { Console.Clear(); }catch (Exception) { }
-                            Console.Error.WriteLine("Current alive connection count:" + threadCnt);
+                            if ((Program.log & 2) == 0)
+                            {
+                                try { Console.Clear(); } catch (Exception) { }
+                            }
+
+                            if ((Program.log & 1) != 0)
+                                Console.Error.WriteLine("Current alive connection count:" + threadCnt);
 
                             mutex.ReleaseMutex();
                             Console.WriteLine("Failed in certificating");
@@ -57,7 +68,7 @@ namespace Ocelot
                         }
                         using var alloc = new TcpClient(sip, rport);
 
-                        if (Program.log)
+                        if ((Program.log & 2) != 0)
                             Console.WriteLine("Relaying " + soft.Client.RemoteEndPoint!.ToString() + " to " + alloc!.Client.RemoteEndPoint!.ToString());
                         using var astream = alloc.GetStream();
                         using var dst = new EncryptNetworkStream(astream, aes.CreateEncryptor(), aes.CreateDecryptor());
@@ -84,21 +95,28 @@ namespace Ocelot
 
                         HandleStream(src, dst);
 
-                        if (Program.log)
+                        if ((Program.log & 2) != 0)
                             Console.WriteLine("Closing " + soft.Client.RemoteEndPoint!.ToString() + " to " + alloc!.Client.RemoteEndPoint!.ToString());
+                        soft.TryClose();
+                        alloc.TryClose();
 
                     }
                     catch (Exception e) { Console.Error.WriteLine(e); }
                     mutex.WaitOne();
 
                     threadCnt--;
-                    try { Console.Clear(); } catch (Exception) { }
-                    Console.Error.WriteLine("Current alive connection count:" + threadCnt);
+                    if ((Program.log & 2) == 0)
+                    {
+                        try { Console.Clear(); } catch (Exception) { }
+                    }
+                    if((Program.log & 1) != 0)
+                        Console.Error.WriteLine("Current alive connection count:" + threadCnt);
 
                     mutex.ReleaseMutex();
                     src.Dispose();
                     soft.Dispose();
                 });
+                th.Start();
             }
         }
 
@@ -150,10 +168,9 @@ namespace Ocelot
 
         public void HandleStream(Stream src, Stream dst)
         {
-            ThreadPool.QueueUserWorkItem(_ => { try { dst.CopyTo(src); } catch (Exception) { } src.TryClose(); dst.TryClose(); });
+            Thread th = new Thread(_ => { try { dst.CopyTo(src); } catch (Exception) { } });
+            th.Start();
             try { src.CopyTo(dst); } catch (Exception) { }
-            dst.TryClose();
-            src.TryClose();
         }
 
     }
